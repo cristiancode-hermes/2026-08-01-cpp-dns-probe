@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>dnsprobe — DNS resolver &amp; packet analyzer</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #1e1e2e;  /* Catppuccin Mocha base */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: 'Fira Code', 'Cascadia Code', monospace;
+    padding: 40px;
+  }
+
+  .terminal {
+    background: #181825;  /* mantle */
+    border-radius: 12px;
+    padding: 24px 28px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    border: 1px solid #313244;  /* surface0 */
+    max-width: 1080px;
+    width: 100%;
+  }
+
+  .terminal-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #313244;
+  }
+
+  .terminal-dot { width: 14px; height: 14px; border-radius: 50%; }
+  .dot-red { background: #f38ba8; }
+  .dot-yellow { background: #f9e2af; }
+  .dot-green { background: #a6e3a1; }
+
+  .terminal-title {
+    color: #6c7086;
+    font-size: 14px;
+    margin-left: 8px;
+    letter-spacing: 0.3px;
+  }
+  .terminal-title span { color: #a6adc8; }
+
+  .output {
+    color: #cdd6f4;
+    font-size: 14px;
+    line-height: 1.75;
+    white-space: pre;
+  }
+  .output .cmd { color: #a6adc8; font-weight: 600; }
+  .output .cmd::before { content: "$ "; color: #a6e3a1; font-weight: 600; }
+
+  .output .banner { color: #89b4fa; font-weight: 600; }
+  .output .dim { color: #585b70; }
+  .output .domain { color: #89dceb; font-weight: 600; }
+  .output .type { color: #cba6f7; }
+  .output .rcode-ok { color: #a6e3a1; font-weight: 600; }
+  .output .ttl { color: #f9e2af; }
+  .output .rdata { color: #a6e3a1; }
+  .output .id { color: #f5c2e7; }
+  .output .arrow { color: #6c7086; }
+  .output .ok { color: #a6e3a1; font-weight: 600; }
+  .output .mx { color: #fab387; }
+
+  .output .section { margin-top: 14px; }
+  .output .footer { color: #6c7086; }
+
+  .prompt {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #313244;
+  }
+  .prompt-symbol { color: #a6e3a1; font-size: 14px; font-weight: 600; }
+  .prompt-text { color: #6c7086; font-size: 13px; }
+</style>
+</head>
+<body>
+<div class="terminal">
+  <div class="terminal-header">
+    <div class="terminal-dot dot-red"></div>
+    <div class="terminal-dot dot-yellow"></div>
+    <div class="terminal-dot dot-green"></div>
+    <div class="terminal-title"><span>$</span> ./dnsprobe — DNS resolver &amp; packet analyzer</div>
+  </div>
+
+  <div class="output"><span class="banner">dnsprobe — DNS resolver &amp; packet analyzer (C++23)</span>
+
+<span class="cmd">./dnsprobe example.com</span>
+  <span class="domain">▸ example.com</span>  <span class="type">(A)</span>  <span class="arrow">→ 127.0.0.11:53  [timeout 3s ×3]</span>
+  <span class="id">id=0xFB0E</span>  flags: QR RD RA   rcode: <span class="rcode-ok">NOERROR</span>
+  question:  example.com  IN  A
+  answer: 2  authority: 0  additional: 0  · 61 bytes
+  <span class="dim">── ANSWER (2)</span>
+    example.com  <span class="ttl">300</span>  IN  <span class="type">A</span>  <span class="rdata">172.66.147.243</span>
+    example.com  <span class="ttl">300</span>  IN  <span class="type">A</span>  <span class="rdata">104.20.23.154</span>
+  <span class="ok">✓ 2 answer(s) in 7.8 ms</span>
+
+<span class="cmd">./dnsprobe gmail.com --type MX</span>
+  <span class="domain">▸ gmail.com</span>  <span class="type">(MX)</span>  <span class="arrow">→ 127.0.0.11:53  [timeout 3s ×3]</span>
+  <span class="id">id=0x2901</span>  flags: QR RD RA   rcode: <span class="rcode-ok">NOERROR</span>
+  question:  gmail.com  IN  MX
+  answer: 5  authority: 0  additional: 0  · 150 bytes
+  <span class="dim">── ANSWER (5)</span>
+    gmail.com  <span class="ttl">521</span>  IN  <span class="type">MX</span>  <span class="mx">5</span>  <span class="rdata">gmail-smtp-in.l.google.com</span>
+    gmail.com  <span class="ttl">521</span>  IN  <span class="type">MX</span>  <span class="mx">10</span> <span class="rdata">alt1.gmail-smtp-in.l.google.com</span>
+    gmail.com  <span class="ttl">521</span>  IN  <span class="type">MX</span>  <span class="mx">40</span> <span class="rdata">alt4.gmail-smtp-in.l.google.com</span>
+    gmail.com  <span class="ttl">521</span>  IN  <span class="type">MX</span>  <span class="mx">30</span> <span class="rdata">alt3.gmail-smtp-in.l.google.com</span>
+    gmail.com  <span class="ttl">521</span>  IN  <span class="type">MX</span>  <span class="mx">20</span> <span class="rdata">alt2.gmail-smtp-in.l.google.com</span>
+  <span class="ok">✓ 5 answer(s) in 3.5 ms</span>
+
+<span class="cmd">./dnsprobe -x 8.8.8.8</span>
+  <span class="domain">▸ 8.8.8.8.in-addr.arpa</span>  <span class="type">(PTR)</span>  <span class="arrow">→ 127.0.0.11:53  [timeout 3s ×3]</span>
+  <span class="id">id=0x87B9</span>  flags: QR RD RA   rcode: <span class="rcode-ok">NOERROR</span>
+  question:  8.8.8.8.in-addr.arpa  IN  PTR
+  answer: 1  authority: 0  additional: 0  · 62 bytes
+  <span class="dim">── ANSWER (1)</span>
+    8.8.8.8.in-addr.arpa  <span class="ttl">86400</span>  IN  <span class="type">PTR</span>  <span class="rdata">dns.google</span>
+  <span class="ok">✓ 1 answer(s) in 299.9 ms</span>
+
+<span class="cmd">./dnsprobe --selftest</span>
+  <span class="ok">10/10 selftests passed</span>  <span class="dim">(encode / decode / parse — incl. real 8.8.8.8 capture)</span>
+
+<span class="footer">wire format RFC 1035 · compression pointers · UDP transport · exit codes 0/1/2 — ./dnsprobe --help</span></div>
+
+  <div class="prompt">
+    <div class="prompt-symbol">❯</div>
+    <div class="prompt-text">dnsprobe v1.0 — C++23, zero external dependencies</div>
+  </div>
+</div>
+</body>
+</html>
