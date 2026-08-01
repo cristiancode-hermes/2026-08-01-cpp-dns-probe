@@ -456,7 +456,13 @@ uint16_t next_id() {
 std::optional<std::vector<uint8_t>> hex_to_bytes(std::string_view hex) {
   std::vector<uint8_t> out;
   std::string clean;
+  bool in_comment = false;
   for (const char c : hex) {
+    if (c == '#') { in_comment = true; continue; }
+    if (in_comment) {
+      if (c == '\n') in_comment = false;
+      continue;
+    }
     if (c == ' ' || c == '\n' || c == '\t' || c == '\r') continue;
     clean += c;
   }
@@ -798,9 +804,9 @@ int run_selftest(const Palette& P) {
           "reverse_name (ipv4)");
   }
   {
-    const auto b = hex_to_bytes(" 0a 0B cC ");
+    const auto b = hex_to_bytes("# comment line\n 0a 0B cC # trailing comment\n");
     check(b && b->size() == 3 && (*b)[0] == 10 && (*b)[1] == 11 && (*b)[2] == 204,
-          "hex_to_bytes");
+          "hex_to_bytes (skips # comments)");
   }
 
   std::println(std::cout, "  {}{}/{} selftests passed{}",
